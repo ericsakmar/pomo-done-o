@@ -24,14 +24,11 @@
         <button x-show="isRunning" @click="stop()">Stop</button>
       </section>
 
-      <section x-show="current" class="summary">
-        <div x-text="current?.start"></div>
-        <div x-text="current?.end"></div>
-
+      <section x-show="isDone" class="summary">
         <div>
           <h2>How was it</h2>
 
-          <select x-model="current?.emotion">
+          <select x-model="emotion">
             <option value=""></option>
             <option value="great">great</option>
             <option value="good">good</option>
@@ -56,8 +53,8 @@
           <tbody>
             <template x-for="p in pomodoros">
               <tr>
-                <td x-text="formatDate(p.start)"></td>
-                <td x-text="formatDate(p.end)"></td>
+                <td x-text="formatDate(p.startDate)"></td>
+                <td x-text="formatDate(p.endDate)"></td>
                 <td x-text="p.emotion"></td>
               </tr>
             </template>
@@ -72,33 +69,34 @@
         const pomodoros = rawData ? JSON.parse(rawData) : [];
 
         return {
-          current: undefined,
+          startDate: undefined,
+          endDarte: undefined,
+          emotion: '',
           remaining: '25:00',
           isRunning: false,
           isDone: false,
           pomodoros,
 
           start() {
-            const start = new Date();
-            const end = new Date(start.getTime() + 1500000); // 25 min in milliseconds
-
-            this.current = {
-              start,
-              end,
-              emotion: '',
-            };
+            this.startDate = new Date();
+            this.endDate = new Date(this.startDate.getTime() + 1500000); // 25 min in milliseconds
+            this.emotion = '';
 
             this.isRunning = true;
             this.tick();
           },
 
           stop() {
-            this.current.end = new Date();
+            this.endDate = new Date();
           },
 
           save() {
-            this.pomodoros.push(current);
-            this.current = undefined;
+            this.pomodoros.push({
+              startDate: this.startDate,
+              endDate: this.endDate,
+              emotion: this.emotion,
+            });
+
             this.isDone = false;
             this.remaining = '25:00';
 
@@ -108,7 +106,7 @@
           tick() {
             setTimeout(() => {
               const now = Date.now();
-              const diffMs = this.current.end.getTime() - now;
+              const diffMs = this.endDate.getTime() - now;
 
               if (diffMs <= 0) {
                 this.isRunning = false;
