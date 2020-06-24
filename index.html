@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <script
+      src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
+      defer
+    ></script>
+  </head>
+
+  <body>
+    <div x-data="app()">
+      <header>
+        <h1>pomo-done-o</h1>
+      </header>
+
+      <section class="countdown">
+        <p x-show="!isDone" x-text="remaining"></p>
+      </section>
+
+      <section class="actions">
+        <button x-show="!isRunning" @click="start()">Start</button>
+        <button x-show="isRunning" @click="stop()">Stop</button>
+      </section>
+
+      <section x-show="current" class="summary">
+        <div x-text="current?.start"></div>
+        <div x-text="current?.end"></div>
+
+        <div>
+          <h2>How was it</h2>
+
+          <select x-model="current?.emotion">
+            <option value=""></option>
+            <option value="great">great</option>
+            <option value="good">good</option>
+            <option value="tired">tired</option>
+            <option value="frustrting">frustrating</option>
+            <option value="distracted">distracted</option>
+          </select>
+        </div>
+
+        <button @click="save()">Save</button>
+      </section>
+
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>start</th>
+              <th>end</th>
+              <th>how was it?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="p in pomodoros">
+              <tr>
+                <td x-text="formatDate(p.start)"></td>
+                <td x-text="formatDate(p.end)"></td>
+                <td x-text="p.emotion"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <script>
+      function app() {
+        const rawData = localStorage.getItem('data');
+        const pomodoros = rawData ? JSON.parse(rawData) : [];
+
+        return {
+          current: undefined,
+          remaining: '25:00',
+          isRunning: false,
+          isDone: false,
+          pomodoros,
+
+          start() {
+            const start = new Date();
+            const end = new Date(start.getTime() + 1500000); // 25 min in milliseconds
+
+            this.current = {
+              start,
+              end,
+              emotion: '',
+            };
+
+            this.isRunning = true;
+            this.tick();
+          },
+
+          stop() {
+            this.current.end = new Date();
+          },
+
+          save() {
+            this.pomodoros.push(current);
+            this.current = undefined;
+            this.isDone = false;
+            this.remaining = '25:00';
+
+            localStorage.setItem('data', JSON.stringify(this.pomodoros));
+          },
+
+          tick() {
+            setTimeout(() => {
+              const now = Date.now();
+              const diffMs = this.current.end.getTime() - now;
+
+              if (diffMs <= 0) {
+                this.isRunning = false;
+                this.isDone = true;
+                return;
+              }
+
+              const diff = new Date(diffMs);
+
+              const displayMin = diff.getMinutes();
+              const displaySec = diff.getSeconds();
+
+              this.remaining = `${displayMin}:${displaySec}`;
+
+              this.tick();
+            }, 200);
+          },
+
+          formatDate(raw) {
+            const date = new Date(raw);
+
+            return `${date.toDateString()} ${date.toTimeString()}`;
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
