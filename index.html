@@ -7,6 +7,13 @@
       src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
       defer
     ></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <style>
+      .bar {
+        fill: dodgerblue;
+      }
+    </style>
   </head>
 
   <body>
@@ -42,6 +49,8 @@
       </section>
 
       <section>
+        <div id="chart"></div>
+
         <table>
           <thead>
             <tr>
@@ -68,6 +77,8 @@
         const rawData = localStorage.getItem('data');
         const pomodoros = rawData ? JSON.parse(rawData) : [];
 
+        drawChart(pomodoros);
+
         return {
           startDate: undefined,
           endDarte: undefined,
@@ -92,8 +103,8 @@
 
           save() {
             this.pomodoros.push({
-              startDate: this.startDate,
-              endDate: this.endDate,
+              startDate: this.startDate.getTime(),
+              endDate: this.endDate.getTime(),
               emotion: this.emotion,
             });
 
@@ -131,6 +142,66 @@
             return `${date.toDateString()} ${date.toTimeString()}`;
           },
         };
+      }
+
+      function drawChart(data) {
+        console.log(data);
+
+        const margin = {top: 20, right: 20, bottom: 30, left: 40},
+          width = 960 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+        const x = d3
+          .scaleBand()
+          .range([0, width])
+          .padding(0.1);
+
+        const y = d3.scaleLinear().range([height, 0]);
+
+        console.log(margin);
+        console.log(height);
+
+        const svg = d3
+          .select('#chart')
+          .append('svg')
+          .attr('width', width + margin.left + margin.right)
+          .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+          .attr(
+            'transform',
+            'translate(' + margin.left + ',' + margin.top + ')',
+          );
+
+        x.domain(data.map((d, i) => i));
+
+        y.domain([
+          d3.min(data, d => d.startDate),
+          d3.max(data, d => d.endDate),
+        ]);
+
+        const y1 = y(data[0].startDate);
+        const y2 = y(data[0].endDate);
+        console.log(y1, y2, y1 - y2);
+
+        svg
+          .selectAll('.bar')
+          .data(data)
+          .enter()
+          .append('rect')
+          .attr('class', 'bar')
+          .attr('x', (d, i) => x(i))
+          .attr('width', x.bandwidth())
+          .attr('y', d => y(d.startDate))
+          .attr('height', d => y(d.startDate) - y(d.endDate));
+
+        // add the x Axis
+        svg
+          .append('g')
+          .attr('transform', 'translate(0,' + height + ')')
+          .call(d3.axisBottom(x));
+
+        // add the y Axis
+        svg.append('g').call(d3.axisLeft(y));
       }
     </script>
   </body>
