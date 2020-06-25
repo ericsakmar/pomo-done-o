@@ -29,6 +29,10 @@
         font-weight: 700;
       }
 
+      .secondary {
+        background-color: #abb2bf;
+      }
+
       h1 {
         color: #c678dd;
       }
@@ -42,6 +46,10 @@
         margin-top: 5rem;
         margin-bottom: 1rem;
         color: #fff;
+      }
+
+      .summary {
+        margin-top: 5rem;
       }
 
       .emotion-picker {
@@ -63,6 +71,7 @@
         font-size: 3rem;
         transition: font-size 100ms ease-in-out;
         position: relative;
+        color: #e5c07b;
       }
 
       .emotion-text {
@@ -86,7 +95,7 @@
       }
 
       .data {
-        margin-top: 5rem;
+        margin-top: 10rem;
       }
 
       table {
@@ -113,10 +122,10 @@
       </header>
 
       <section class="countdown">
-        <div x-show="!isDone" x-text="remaining"></div>
+        <div x-text="countDisplay"></div>
       </section>
 
-      <section class="actions">
+      <section x-show="!isDone" class="actions">
         <button x-show="!isRunning" @click="start()">Start</button>
         <button x-show="isRunning" @click="stop()">Stop</button>
       </section>
@@ -147,6 +156,7 @@
         </div>
 
         <button @click="save()">Save</button>
+        <button class="secondary" @click="cancel()">Cancel</button>
       </section>
 
       <section class="data">
@@ -198,7 +208,7 @@
           startDate: undefined,
           endDarte: undefined,
           emotion: '',
-          remaining: '25:00',
+          countDisplay: '25:00',
           isRunning: false,
           isDone: false,
 
@@ -215,6 +225,15 @@
             this.endDate = new Date();
           },
 
+          cancel() {
+            this.startDate = undefined;
+            this.endDate = undefined;
+            this.emotion = '';
+            this.countDisplay = '25:00';
+            this.isDone = false;
+            this.isRunning = false;
+          },
+
           save() {
             this.pomodoros.push({
               startDate: this.startDate.getTime(),
@@ -222,10 +241,11 @@
               emotion: this.emotion,
             });
 
-            this.isDone = false;
-            this.remaining = '25:00';
-
             localStorage.setItem('data', JSON.stringify(this.pomodoros));
+
+            this.cancel(); // just resets everything
+
+            // TODO reload chart
           },
 
           tick() {
@@ -240,12 +260,12 @@
               }
 
               const diff = new Date(diffMs);
+              const pad = w => (w.length === 1 ? `0${w}` : w);
 
-              const displayMin = diff.getMinutes();
-              const displaySec = diff.getSeconds();
+              const displayMin = pad(diff.getMinutes().toString());
+              const displaySec = pad(diff.getSeconds().toString());
 
-              this.remaining = `${displayMin}:${displaySec}`;
-
+              this.countDisplay = `${displayMin}:${displaySec}`;
               this.tick();
             }, 200);
           },
@@ -269,8 +289,8 @@
           date: moment(d.startDate).format('ddd, MMM D'),
           start: normalizeTime(min, d.startDate),
           end: normalizeTime(min, d.endDate),
+          emotion: emotions.find(e => e.value === d.emotion).label,
         }));
-        console.log(normalized);
 
         return normalized;
       }
@@ -296,12 +316,19 @@
           width = 960 - margin.left - margin.right,
           height = days.length * 100 - margin.top - margin.bottom;
 
-        const x = d3.scaleLinear().range([width, 0]);
+        const x = d3
+          .scaleLinear()
+          .range([width, 0])
+          .domain([
+            d3.max(normalized, d => d.end),
+            d3.min(normalized, d => d.start),
+          ]);
 
         const y = d3
           .scaleBand()
           .range([0, height])
-          .padding(0.1);
+          .padding(0.1)
+          .domain(days);
 
         const svg = d3
           .select('#chart')
@@ -314,13 +341,6 @@
             'translate(' + margin.left + ',' + margin.top + ')',
           );
 
-        x.domain([
-          d3.max(normalized, d => d.end),
-          d3.min(normalized, d => d.start),
-        ]);
-
-        y.domain(days);
-
         svg
           .selectAll('.bar')
           .data(normalized)
@@ -331,6 +351,17 @@
           .attr('width', d => x(d.end) - x(d.start))
           .attr('y', (d, i) => y(d.date))
           .attr('height', y.bandwidth());
+
+        svg
+          .selectAll('.emo')
+          .data(normalized)
+          .enter()
+          .append('text')
+          .attr('x', d => x(d.start))
+          .attr('y', (d, i) => y(d.date) + 30)
+          .attr('fill', 'red')
+          .attr('font-size', '24px')
+          .text(d => d.emotion);
 
         svg
           .append('g')
