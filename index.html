@@ -159,7 +159,7 @@
         <button class="secondary" @click="cancel()">Cancel</button>
       </section>
 
-      <section class="data">
+      <section x-show="pomodoros.length" class="data">
         <div id="chart"></div>
 
         <table>
