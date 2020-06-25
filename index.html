@@ -9,6 +9,7 @@
     ></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
 
     <style>
       .bar {
@@ -149,7 +150,25 @@
         const timeFormat = d3.timeFormat('%I:%M %p');
         const dateFormat = d3.timeFormat('%m-%d-%Y');
 
-        const grouped = d3.group(data, d => dateFormat(new Date(d.startDate)));
+        // normalize start and end times
+        const min = d3.min(data, d => d.startDate);
+        const normalize = date => {
+          // treats every start/end time like it happened on the earliest day
+          const m1 = moment(date);
+          const d2 = moment(min)
+            .startOf('day')
+            .hours(m1.hours())
+            .minutes(m1.minutes());
+
+          return d2.valueOf();
+        };
+        const normalized = data.map(d => ({
+          date: dateFormat(new Date(d.startDate)),
+          start: normalize(d.startDate),
+          end: normalize(d.endDate),
+        }));
+
+        const grouped = d3.group(normalized, d => d.date);
         const days = Array.from(grouped.keys());
 
         const margin = {top: 20, right: 20, bottom: 30, left: 80},
@@ -175,21 +194,21 @@
           );
 
         x.domain([
-          d3.max(data, d => d.endDate),
-          d3.min(data, d => d.startDate),
+          d3.max(normalized, d => d.end),
+          d3.min(normalized, d => d.start),
         ]);
 
         y.domain(days);
 
         svg
           .selectAll('.bar')
-          .data(data)
+          .data(normalized)
           .enter()
           .append('rect')
           .attr('class', 'bar')
-          .attr('x', d => x(d.startDate))
-          .attr('width', d => x(d.endDate) - x(d.startDate))
-          .attr('y', (d, i) => y(dateFormat(new Date(d.startDate))))
+          .attr('x', d => x(d.start))
+          .attr('width', d => x(d.end) - x(d.start))
+          .attr('y', (d, i) => y(d.date))
           .attr('height', y.bandwidth());
 
         svg
