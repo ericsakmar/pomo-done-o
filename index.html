@@ -33,18 +33,27 @@
         <button x-show="isRunning" @click="stop()">Stop</button>
       </section>
 
-      <section x-show="isDone" class="summary">
+      <section class="summary">
         <div>
           <h2>How was it</h2>
 
-          <select x-model="emotion">
-            <option value=""></option>
-            <option value="great">great</option>
-            <option value="good">good</option>
-            <option value="tired">tired</option>
-            <option value="frustrting">frustrating</option>
-            <option value="distracted">distracted</option>
-          </select>
+          <div class="emotion-picker">
+            <template x-for="e in emotions">
+              <div>
+                <input
+                  x-bind:id="e.value"
+                  type="radio"
+                  name="emotion"
+                  x-bind:value="e.value"
+                  x-model="emotion"
+                />
+
+                <label x-bind:for="e.value">
+                  <span x-text="e.label"></span>
+                </label>
+              </div>
+            </template>
+          </div>
         </div>
 
         <button @click="save()">Save</button>
@@ -75,6 +84,16 @@
     </div>
 
     <script>
+      const emotions = [
+        {value: 'great', label: '🤓'},
+        {value: 'good', label: '😀'},
+        {value: 'ok', label: '🙂'},
+        {value: 'tired', label: '😴'},
+        {value: 'frustrated', label: '😖'},
+        {value: 'confused', label: '😕'},
+        {value: 'distracted', label: '🤪'}, // or 😒?
+      ];
+
       function app() {
         const rawData = localStorage.getItem('data');
         const pomodoros = rawData ? JSON.parse(rawData) : [];
@@ -82,13 +101,14 @@
         drawChart(pomodoros);
 
         return {
+          pomodoros,
+          emotions,
           startDate: undefined,
           endDarte: undefined,
           emotion: '',
           remaining: '25:00',
           isRunning: false,
           isDone: false,
-          pomodoros,
 
           start() {
             this.startDate = new Date();
