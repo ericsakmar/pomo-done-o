@@ -8,6 +8,7 @@
       defer
     ></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
 
     <style>
       .bar {
@@ -145,11 +146,15 @@
       }
 
       function drawChart(data) {
-        console.log(data);
+        const timeFormat = d3.timeFormat('%I:%M %p');
+        const dateFormat = d3.timeFormat('%m-%d-%Y');
 
-        const margin = {top: 20, right: 20, bottom: 30, left: 40},
+        const grouped = d3.group(data, d => dateFormat(new Date(d.startDate)));
+        const days = Array.from(grouped.keys());
+
+        const margin = {top: 20, right: 20, bottom: 30, left: 80},
           width = 960 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+          height = days.length * 100 - margin.top - margin.bottom;
 
         const x = d3.scaleLinear().range([width, 0]);
 
@@ -174,7 +179,7 @@
           d3.min(data, d => d.startDate),
         ]);
 
-        y.domain(data.map((d, i) => i));
+        y.domain(days);
 
         svg
           .selectAll('.bar')
@@ -184,10 +189,8 @@
           .attr('class', 'bar')
           .attr('x', d => x(d.startDate))
           .attr('width', d => x(d.endDate) - x(d.startDate))
-          .attr('y', (d, i) => y(0))
+          .attr('y', (d, i) => y(dateFormat(new Date(d.startDate))))
           .attr('height', y.bandwidth());
-
-        const timeFormat = d3.timeFormat('%I:%M %p');
 
         svg
           .append('g')
