@@ -44,14 +44,27 @@
         margin: 0.2rem;
         font-size: 3rem;
         transition: font-size 100ms ease-in-out;
+        position: relative;
       }
 
-      .emotion-label:hover {
-        font-size: 5rem;
+      .emotion-text {
+        font-size: 1rem;
+        position: absolute;
+        width: 10rem;
+        top: -0.5rem;
+        left: -2.5rem;
+        opacity: 0;
+        transition: opacity 100ms ease-in-out;
       }
 
+      .emotion-label:hover,
       .emotion-option:checked ~ .emotion-label {
         font-size: 5rem;
+      }
+
+      .emotion-label:hover .emotion-text,
+      .emotion-option:checked ~ .emotion-label .emotion-text {
+        opacity: 1;
       }
 
       .data {
@@ -79,7 +92,7 @@
         <button x-show="isRunning" @click="stop()">Stop</button>
       </section>
 
-      <section x-show="isDone" class="summary">
+      <section class="summary">
         <div>
           <h2>How was it?</h2>
 
@@ -96,7 +109,8 @@
                 />
 
                 <label class="emotion-label" x-bind:for="e.value">
-                  <span x-text="e.label"></span>
+                  <div x-text="e.value" class="emotion-text"></div>
+                  <div x-text="e.label"></div>
                 </label>
               </div>
             </template>
