@@ -244,8 +244,7 @@
             localStorage.setItem('data', JSON.stringify(this.pomodoros));
 
             this.cancel(); // just resets everything
-
-            // TODO reload chart
+            drawChart(this.pomodoros);
           },
 
           tick() {
@@ -329,6 +328,8 @@
           .range([0, height])
           .padding(0.1)
           .domain(days);
+
+        d3.select('#chart svg').remove();
 
         const svg = d3
           .select('#chart')
