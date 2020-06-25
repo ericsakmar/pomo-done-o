@@ -12,6 +12,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
 
     <style>
+      body {
+        font-family: monospace;
+      }
+
+      section {
+        margin: 2rem auto;
+      }
+
+      .app {
+        text-align: center;
+      }
+
+      .countdown {
+        font-size: 4rem;
+      }
+
+      .emotion-picker {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: end;
+        height: 7rem;
+      }
+
+      .emotion-option {
+        opacity: 0;
+        position: absolute;
+      }
+
+      .emotion-label {
+        display: inline-block;
+        margin: 0.2rem;
+        font-size: 3rem;
+        transition: font-size 100ms ease-in-out;
+      }
+
+      .emotion-label:hover {
+        font-size: 5rem;
+      }
+
+      .emotion-option:checked ~ .emotion-label {
+        font-size: 5rem;
+      }
+
       .bar {
         fill: dodgerblue;
       }
@@ -19,7 +63,7 @@
   </head>
 
   <body>
-    <div x-data="app()">
+    <div x-data="app()" class="app">
       <header>
         <h1>pomo-done-o</h1>
       </header>
@@ -33,14 +77,15 @@
         <button x-show="isRunning" @click="stop()">Stop</button>
       </section>
 
-      <section class="summary">
+      <section x-show="isDone" class="summary">
         <div>
-          <h2>How was it</h2>
+          <h2>How was it?</h2>
 
           <div class="emotion-picker">
             <template x-for="e in emotions">
               <div>
                 <input
+                  class="emotion-option"
                   x-bind:id="e.value"
                   type="radio"
                   name="emotion"
@@ -48,7 +93,7 @@
                   x-model="emotion"
                 />
 
-                <label x-bind:for="e.value">
+                <label class="emotion-label" x-bind:for="e.value">
                   <span x-text="e.label"></span>
                 </label>
               </div>
