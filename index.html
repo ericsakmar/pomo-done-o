@@ -146,14 +146,14 @@
         };
       }
 
-      function drawChart(data) {
-        const timeFormat = d3.timeFormat('%I:%M %p');
+      // treats every start/end time like it happened on the earliest day
+      // so that we can display them as stacked bars
+      function normalize(data) {
+        const min = d3.min(data, d => d.startDate);
         const dateFormat = d3.timeFormat('%m-%d-%Y');
 
-        // normalize start and end times
-        const min = d3.min(data, d => d.startDate);
-        const normalize = date => {
-          // treats every start/end time like it happened on the earliest day
+        // TODO rename
+        const normalizeTime = date => {
           const m1 = moment(date);
           const d2 = moment(min)
             .startOf('day')
@@ -162,12 +162,20 @@
 
           return d2.valueOf();
         };
+
         const normalized = data.map(d => ({
           date: dateFormat(new Date(d.startDate)),
-          start: normalize(d.startDate),
-          end: normalize(d.endDate),
+          start: normalizeTime(d.startDate),
+          end: normalizeTime(d.endDate),
         }));
 
+        return normalized;
+      }
+
+      function drawChart(data) {
+        const timeFormat = d3.timeFormat('%I:%M %p');
+
+        const normalized = normalize(data);
         const grouped = d3.group(normalized, d => d.date);
         const days = Array.from(grouped.keys());
 
