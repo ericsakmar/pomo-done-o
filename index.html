@@ -16,16 +16,14 @@
         font-family: monospace;
       }
 
-      section {
-        margin: 2rem auto;
-      }
-
       .app {
         text-align: center;
       }
 
       .countdown {
         font-size: 4rem;
+        margin-top: 5rem;
+        margin-bottom: 1rem;
       }
 
       .emotion-picker {
@@ -56,6 +54,10 @@
         font-size: 5rem;
       }
 
+      .data {
+        margin-top: 5rem;
+      }
+
       .bar {
         fill: dodgerblue;
       }
@@ -69,7 +71,7 @@
       </header>
 
       <section class="countdown">
-        <p x-show="!isDone" x-text="remaining"></p>
+        <div x-show="!isDone" x-text="remaining"></div>
       </section>
 
       <section class="actions">
@@ -104,7 +106,7 @@
         <button @click="save()">Save</button>
       </section>
 
-      <section>
+      <section class="data">
         <div id="chart"></div>
 
         <table>
@@ -232,7 +234,8 @@
         const d2 = moment(base)
           .startOf('day')
           .hours(m1.hours())
-          .minutes(m1.minutes());
+          .minutes(m1.minutes())
+          .seconds(m1.seconds());
         return d2.valueOf();
       }
 
