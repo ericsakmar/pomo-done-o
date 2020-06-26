@@ -196,6 +196,19 @@
         {value: 'distracted', label: '🤪'}, // or 😒?
       ];
 
+      const DATE_FORMAT = 'ddd, MMM D';
+      const TIME_FORMAT = 'hh:mm a';
+
+      const formatDate = raw => {
+        return moment(raw).format(DATE_FORMAT);
+      };
+
+      const formatTime = raw => {
+        return moment(raw).format(TIME_FORMAT);
+      };
+
+      const pad = i => (i.toString().length === 1 ? `0${i}` : i);
+
       function app() {
         const rawData = localStorage.getItem('data');
         const pomodoros = rawData ? JSON.parse(rawData) : [];
@@ -205,6 +218,8 @@
         return {
           pomodoros,
           emotions,
+          formatDate,
+          formatTime,
           startDate: undefined,
           endDarte: undefined,
           emotion: '',
@@ -261,26 +276,14 @@
 
               const diff = new Date(diffMs);
 
-              // TODO take a number, bump up
-              const pad = w => (w.length === 1 ? `0${w}` : w);
-
-              const displayMin = pad(diff.getMinutes().toString());
-              const displaySec = pad(diff.getSeconds().toString());
+              const displayMin = pad(diff.getMinutes());
+              const displaySec = pad(diff.getSeconds());
 
               this.countDisplay = `${displayMin}:${displaySec}`;
               document.title = `${this.countDisplay} - pomo-mood-o`;
 
               this.tick();
             }, 200);
-          },
-
-          // TODO share these
-          formatDate(raw) {
-            return moment(raw).format('ddd, MMM D');
-          },
-
-          formatTime(raw) {
-            return moment(raw).format('hh:mm a');
           },
         };
       }
@@ -291,7 +294,7 @@
         const min = d3.min(data, d => d.startDate);
 
         const normalized = data.map(d => ({
-          date: moment(d.startDate).format('ddd, MMM D'),
+          date: formatDate(d.startDate),
           start: normalizeTime(min, d.startDate),
           end: normalizeTime(min, d.endDate),
           emotion: emotions.find(e => e.value === d.emotion).label,
@@ -311,8 +314,6 @@
       }
 
       function drawChart(data) {
-        const timeFormat = d3.timeFormat('%I:%M %p');
-
         const normalized = normalize(data);
         const grouped = d3.group(normalized, d => d.date);
         const days = Array.from(grouped.keys());
@@ -373,7 +374,7 @@
         svg
           .append('g')
           .attr('transform', 'translate(0,' + height + ')')
-          .call(d3.axisBottom(x).tickFormat(timeFormat));
+          .call(d3.axisBottom(x).tickFormat(formatTime));
 
         svg.append('g').call(d3.axisLeft(y));
       }
