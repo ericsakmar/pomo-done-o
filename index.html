@@ -230,6 +230,7 @@
             this.endDate = undefined;
             this.emotion = '';
             this.countDisplay = '25:00';
+            document.title = 'pomo-mood-o';
             this.isDone = false;
             this.isRunning = false;
           },
@@ -259,16 +260,21 @@
               }
 
               const diff = new Date(diffMs);
+
+              // TODO take a number, bump up
               const pad = w => (w.length === 1 ? `0${w}` : w);
 
               const displayMin = pad(diff.getMinutes().toString());
               const displaySec = pad(diff.getSeconds().toString());
 
               this.countDisplay = `${displayMin}:${displaySec}`;
+              document.title = `${this.countDisplay} - pomo-mood-o`;
+
               this.tick();
             }, 200);
           },
 
+          // TODO share these
           formatDate(raw) {
             return moment(raw).format('ddd, MMM D');
           },
