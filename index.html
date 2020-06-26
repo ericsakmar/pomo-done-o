@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>pomo-done-o</title>
+    <title>pomo-mood-o</title>
     <script
       src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
       defer
@@ -118,7 +118,7 @@
   <body>
     <div x-data="app()" class="app">
       <header>
-        <h1>pomo-done-o</h1>
+        <h1>pomo-mood-o</h1>
       </header>
 
       <section class="countdown">
@@ -132,7 +132,7 @@
 
       <section x-show="isDone" class="summary">
         <div>
-          <h2>How was it?</h2>
+          <h2>How did you feel?</h2>
 
           <div class="emotion-picker">
             <template x-for="e in emotions">
@@ -168,7 +168,7 @@
               <th>date</th>
               <th>start</th>
               <th>end</th>
-              <th>how was it?</th>
+              <th>how did you feel?</th>
             </tr>
           </thead>
           <tbody>
