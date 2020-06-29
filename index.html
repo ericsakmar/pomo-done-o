@@ -190,10 +190,11 @@
         {value: 'great', label: '🤓'},
         {value: 'good', label: '😀'},
         {value: 'ok', label: '🙂'},
+        {value: 'depressed', label: '😞'},
         {value: 'tired', label: '😴'},
         {value: 'frustrated', label: '😖'},
-        {value: 'confused', label: '😕'},
-        {value: 'distracted', label: '🤪'}, // or 😒?
+        // {value: 'confused', label: '😕'},
+        {value: 'distracted', label: '🤪'},
       ];
 
       const DATE_FORMAT = 'ddd, MMM D';
@@ -293,12 +294,14 @@
       function normalize(data) {
         const min = d3.min(data, d => d.startDate);
 
-        const normalized = data.map(d => ({
-          date: formatDate(d.startDate),
-          start: normalizeTime(min, d.startDate),
-          end: normalizeTime(min, d.endDate),
-          emotion: emotions.find(e => e.value === d.emotion).label,
-        }));
+        const normalized = data
+          .sort((a, b) => b.startDate - a.startDate)
+          .map(d => ({
+            date: formatDate(d.startDate),
+            start: normalizeTime(min, d.startDate),
+            end: normalizeTime(min, d.endDate),
+            emotion: emotions.find(e => e.value === d.emotion).label,
+          }));
 
         return normalized;
       }
