@@ -190,15 +190,22 @@
     </div>
 
     <script>
+      // TODO
+      // - toggle table
+      // - fade bars based on weight
+      // - empty state
+      // - responsiveness
+      // - a11y for the emoji?
+      // - chart filtering?
       const emotions = [
-        {value: 'great', label: '🤓'},
-        {value: 'good', label: '😀'},
-        {value: 'ok', label: '🙂'},
-        {value: 'depressed', label: '😞'},
-        {value: 'tired', label: '😴'},
-        {value: 'frustrated', label: '😖'},
+        {value: 'great', label: '🤓', opacity: 1},
+        {value: 'good', label: '😀', opacity: 0.9},
+        {value: 'ok', label: '🙂', opacity: 0.8},
+        {value: 'depressed', label: '😞', opacity: 0.5},
+        {value: 'tired', label: '😴', opacity: 0.6},
+        {value: 'frustrated', label: '😖', opacity: 0.6},
         // {value: 'confused', label: '😕'},
-        {value: 'distracted', label: '🤪'},
+        {value: 'distracted', label: '🤪', opacity: 0.5},
       ];
 
       const DATE_FORMAT = 'ddd, MMM D';
@@ -305,6 +312,7 @@
             start: normalizeTime(min, d.startDate),
             end: normalizeTime(min, d.endDate),
             emotion: emotions.find(e => e.value === d.emotion).label,
+            opacity: emotions.find(e => e.value === d.emotion).opacity,
           }));
 
         return normalized;
@@ -365,7 +373,8 @@
           .attr('x', d => x(d.start))
           .attr('width', d => x(d.end) - x(d.start))
           .attr('y', (d, i) => y(d.date))
-          .attr('height', y.bandwidth());
+          .attr('height', y.bandwidth())
+          .attr('opacity', d => d.opacity);
 
         svg
           .selectAll('.emo')
