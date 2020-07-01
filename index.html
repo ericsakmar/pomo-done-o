@@ -162,7 +162,16 @@
       <section x-show="pomodoros.length" class="data">
         <div id="chart"></div>
 
-        <table>
+        <div>
+          <button @click="showRaw = true" x-show="!showRaw" class="secondary">
+            Show Raw Data
+          </button>
+          <button @click="showRaw = false" x-show="showRaw" class="secondary">
+            Hide Raw Data
+          </button>
+        </div>
+
+        <table x-show="showRaw">
           <thead>
             <tr>
               <th>date</th>
@@ -187,8 +196,6 @@
 
     <script>
       // TODO
-      // - toggle table
-      // - empty state
       // - responsiveness
       // - a11y for the emoji?
       // - chart filtering?
@@ -234,6 +241,7 @@
           countDisplay: '25:00',
           isRunning: false,
           isDone: false,
+          showRaw: false,
 
           start() {
             this.startDate = new Date();
