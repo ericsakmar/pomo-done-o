@@ -112,10 +112,6 @@
       td {
         padding: 0.1rem 0.5rem;
       }
-
-      .bar {
-        fill: #9ac379;
-      }
     </style>
   </head>
 
@@ -192,20 +188,20 @@
     <script>
       // TODO
       // - toggle table
-      // - fade bars based on weight
       // - empty state
       // - responsiveness
       // - a11y for the emoji?
       // - chart filtering?
+      // - offline/pwa
+      // - keep it running if you close the tab
       const emotions = [
-        {value: 'great', label: '🤓', opacity: 1},
-        {value: 'good', label: '😀', opacity: 0.9},
-        {value: 'ok', label: '🙂', opacity: 0.8},
-        {value: 'depressed', label: '😞', opacity: 0.5},
-        {value: 'tired', label: '😴', opacity: 0.6},
-        {value: 'frustrated', label: '😖', opacity: 0.6},
-        // {value: 'confused', label: '😕'},
-        {value: 'distracted', label: '🤪', opacity: 0.5},
+        {value: 'great', label: '🤓', color: '#9ac379'},
+        {value: 'good', label: '😀', color: '#9ac379'},
+        {value: 'ok', label: '🙂', color: '#9ac379'},
+        {value: 'depressed', label: '😞', color: '#e5c07b'},
+        {value: 'tired', label: '😴', color: '#e5c07b'},
+        {value: 'frustrated', label: '😖', color: '#e06c75'},
+        {value: 'distracted', label: '🤪', color: '#e06c75'},
       ];
 
       const DATE_FORMAT = 'ddd, MMM D';
@@ -312,7 +308,7 @@
             start: normalizeTime(min, d.startDate),
             end: normalizeTime(min, d.endDate),
             emotion: emotions.find(e => e.value === d.emotion).label,
-            opacity: emotions.find(e => e.value === d.emotion).opacity,
+            color: emotions.find(e => e.value === d.emotion).color,
           }));
 
         return normalized;
@@ -374,7 +370,7 @@
           .attr('width', d => x(d.end) - x(d.start))
           .attr('y', (d, i) => y(d.date))
           .attr('height', y.bandwidth())
-          .attr('opacity', d => d.opacity);
+          .attr('fill', d => d.color);
 
         svg
           .selectAll('.emo')
@@ -382,8 +378,7 @@
           .enter()
           .append('text')
           .attr('x', d => x(d.start))
-          .attr('y', (d, i) => y(d.date) + 30)
-          .attr('fill', 'red')
+          .attr('y', (d, i) => y(d.date) + 48)
           .attr('font-size', '24px')
           .text(d => d.emotion);
 
