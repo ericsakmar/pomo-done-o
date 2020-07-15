@@ -332,6 +332,10 @@
         return d2.valueOf();
       }
 
+      function parseDayOfWeek(date) {
+        return date.substring(0, 3).toLocaleLowerCase();
+      }
+
       function drawChart(data) {
         const normalized = normalize(data);
         const grouped = d3.group(normalized, d => d.date);
@@ -374,13 +378,26 @@
           .data(days)
           .enter()
           .append('rect')
-          .attr('class', 'bar')
+          .attr('class', d => 'background-bar')
+          .attr('class', d => `background-bar__${parseDayOfWeek(d)}`)
           .attr('x', 0)
           .attr('width', width)
           .attr('y', (d, i) => y(d))
           .attr('height', y.bandwidth())
           .attr('opacity', 0.1)
-          .attr('fill', '#fff');
+          .attr('fill', '#abb2bf')
+          .on('mouseover', d => {
+            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`).attr(
+              'opacity',
+              0.5,
+            );
+          })
+          .on('mouseout', d => {
+            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`).attr(
+              'opacity',
+              0.1,
+            );
+          });
 
         svg
           .append('g')
