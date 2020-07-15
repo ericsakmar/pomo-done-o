@@ -347,7 +347,7 @@
           height = days.length * 50 - margin.top - margin.bottom;
 
         const x = d3
-          .scaleLinear()
+          .scaleTime()
           .range([width, 0])
           .domain([
             d3.max(normalized, d => d.end),
