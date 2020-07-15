@@ -373,6 +373,7 @@
             'translate(' + margin.left + ',' + margin.top + ')',
           );
 
+        // background bars
         svg
           .append('g')
           .selectAll('.background-bar')
@@ -402,6 +403,20 @@
             );
           });
 
+        // verticals
+        svg
+          .append('g')
+          .selectAll('vertical')
+          .data(x.ticks())
+          .enter()
+          .append('rect')
+          .attr('x', d => x(d) - 1)
+          .attr('width', 3)
+          .attr('y', 0)
+          .attr('height', height)
+          .attr('fill', '#282c34');
+
+        // bars
         svg
           .append('g')
           .selectAll('.bar')
@@ -415,6 +430,7 @@
           .attr('height', y.bandwidth())
           .attr('fill', d => d.color);
 
+        // emoji
         svg
           .selectAll('.emo')
           .data(normalized)
