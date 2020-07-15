@@ -369,6 +369,7 @@
           );
 
         svg
+          .append('g')
           .selectAll('.background-bar')
           .data(days)
           .enter()
@@ -382,6 +383,7 @@
           .attr('fill', '#fff');
 
         svg
+          .append('g')
           .selectAll('.bar')
           .data(normalized)
           .enter()
