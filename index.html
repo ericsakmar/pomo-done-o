@@ -339,7 +339,7 @@
 
         const margin = {top: 20, right: 20, bottom: 30, left: 80},
           width = 960 - margin.left - margin.right,
-          height = days.length * 100 - margin.top - margin.bottom;
+          height = days.length * 50 - margin.top - margin.bottom;
 
         const x = d3
           .scaleLinear()
@@ -369,6 +369,19 @@
           );
 
         svg
+          .selectAll('.background-bar')
+          .data(days)
+          .enter()
+          .append('rect')
+          .attr('class', 'bar')
+          .attr('x', 0)
+          .attr('width', width)
+          .attr('y', (d, i) => y(d))
+          .attr('height', y.bandwidth())
+          .attr('opacity', 0.1)
+          .attr('fill', '#fff');
+
+        svg
           .selectAll('.bar')
           .data(normalized)
           .enter()
@@ -385,8 +398,8 @@
           .data(normalized)
           .enter()
           .append('text')
-          .attr('x', d => x(d.start))
-          .attr('y', (d, i) => y(d.date) + 48)
+          .attr('x', d => x(d.start) + 2)
+          .attr('y', (d, i) => y(d.date) + 25)
           .attr('font-size', '24px')
           .text(d => d.emotion);
 
