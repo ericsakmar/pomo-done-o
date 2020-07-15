@@ -317,6 +317,7 @@
             end: normalizeTime(min, d.endDate),
             emotion: emotions.find(e => e.value === d.emotion).label,
             color: emotions.find(e => e.value === d.emotion).color,
+            emotionText: d.emotion,
           }));
 
         return normalized;
@@ -378,8 +379,10 @@
           .data(days)
           .enter()
           .append('rect')
-          .attr('class', d => 'background-bar')
-          .attr('class', d => `background-bar__${parseDayOfWeek(d)}`)
+          .attr(
+            'class',
+            d => `background-bar background-bar__${parseDayOfWeek(d)}`,
+          )
           .attr('x', 0)
           .attr('width', width)
           .attr('y', (d, i) => y(d))
@@ -405,7 +408,7 @@
           .data(normalized)
           .enter()
           .append('rect')
-          .attr('class', 'bar')
+          .attr('class', d => `bar bar__${d.emotionText}`)
           .attr('x', d => x(d.start))
           .attr('width', d => x(d.end) - x(d.start))
           .attr('y', (d, i) => y(d.date))
@@ -417,10 +420,21 @@
           .data(normalized)
           .enter()
           .append('text')
+          .attr('class', d => `emo emo__${d.emotionText}`)
           .attr('x', d => x(d.start) + 2)
           .attr('y', (d, i) => y(d.date) + 25)
           .attr('font-size', '24px')
-          .text(d => d.emotion);
+          .text(d => d.emotion)
+          .on('mouseover', d => {
+            d3.selectAll(
+              `.bar:not(.bar__${d.emotionText}), .emo:not(.emo__${d.emotionText})`,
+            ).attr('opacity', 0.2);
+          })
+          .on('mouseout', d => {
+            d3.selectAll(
+              `.bar:not(.bar__${d.emotionText}), .emo:not(.emo__${d.emotionText})`,
+            ).attr('opacity', 1);
+          });
 
         svg
           .append('g')
