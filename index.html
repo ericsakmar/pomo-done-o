@@ -7,6 +7,11 @@
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍅</text></svg>"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap"
+      rel="stylesheet"
+    />
+
     <script
       src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
       defer
@@ -17,7 +22,6 @@
 
     <style>
       body {
-        font-family: monospace;
         background-color: #282c34;
         color: #abb2bf;
       }
@@ -28,9 +32,14 @@
         font-size: 1rem;
         padding: 0.2em 1em;
         color: #fff;
-        font-family: monospace;
         border-radius: 0.2em;
         font-weight: 700;
+      }
+
+      body,
+      button,
+      text {
+        font-family: 'Space Mono', monospace;
       }
 
       .secondary {
@@ -100,6 +109,7 @@
 
       .data {
         margin-top: 10rem;
+        margin-bottom: 5rem;
       }
 
       table {
@@ -212,7 +222,7 @@
       ];
 
       const DATE_FORMAT = 'ddd, MMM D';
-      const TIME_FORMAT = 'hh:mm a';
+      const TIME_FORMAT = 'h:mm a';
 
       const formatDate = raw => {
         return moment(raw).format(DATE_FORMAT);
@@ -391,16 +401,16 @@
           .attr('opacity', 0.1)
           .attr('fill', '#abb2bf')
           .on('mouseover', d => {
-            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`).attr(
-              'opacity',
-              0.5,
-            );
+            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`)
+              .transition()
+              .duration(200)
+              .attr('opacity', 0.5);
           })
           .on('mouseout', d => {
-            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`).attr(
-              'opacity',
-              0.1,
-            );
+            d3.selectAll(`.background-bar__${parseDayOfWeek(d)}`)
+              .transition()
+              .duration(200)
+              .attr('opacity', 0.1);
           });
 
         // verticals
@@ -444,12 +454,18 @@
           .on('mouseover', d => {
             d3.selectAll(
               `.bar:not(.bar__${d.emotionText}), .emo:not(.emo__${d.emotionText})`,
-            ).attr('opacity', 0.2);
+            )
+              .transition()
+              .duration(200)
+              .attr('opacity', 0.2);
           })
           .on('mouseout', d => {
             d3.selectAll(
               `.bar:not(.bar__${d.emotionText}), .emo:not(.emo__${d.emotionText})`,
-            ).attr('opacity', 1);
+            )
+              .transition()
+              .duration(200)
+              .attr('opacity', 1);
           });
 
         svg
