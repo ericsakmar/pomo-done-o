@@ -69,8 +69,8 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        align-items: flex-end;
-        height: 7rem;
+        align-items: center;
+        height: 8rem;
       }
 
       .emotion-option {
@@ -295,6 +295,9 @@
               const diffMs = this.endDate.getTime() - now;
 
               if (diffMs <= 0) {
+                this.countDisplay = '00:00';
+                document.title = '00:00 - pomo-mood-o';
+
                 this.isRunning = false;
                 this.isDone = true;
                 return;
